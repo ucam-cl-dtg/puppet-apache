@@ -13,11 +13,11 @@
 #
 # The parameters ensure, content and source behave like their respective
 # counterparts on the File type.
-define apache::site ( $ensure = 'present', $require_package = 'apache', $content = '', $source = '') {
+define apache::site ( $ensure = 'present', $require_package = 'apache', $content = undef, $source = undef) {
 	include apache
 
 	$site_file = "${module_dir_path}/apache/sites/${name}"
-	config_file {
+	file {
 		$site_file:
 			ensure => $ensure,
 			content => $content,

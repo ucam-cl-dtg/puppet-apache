@@ -27,7 +27,7 @@ class apache::base {
 	package {
 		"apache":
 			ensure => installed,
-			before => Concat["/etc/apache2/ports.conf"];
+			before => File["/etc/apache2/ports.conf"];
 	}
 
 	service { apache:
@@ -41,10 +41,9 @@ class apache::base {
 
 	# TODO: This has to be replaced by OS-specific configuration redirection
 	# into $module_dir_path/apache
-	include concat::setup
-	concat {
-		"/etc/apache2/ports.conf":
-			mode => 644, owner => root, group => root,
+	file { "/etc/apache2/ports.conf":
+		ensure => present,
+		mode => 644, owner => root, group => root,
 	}
 	file {
 		"/etc/apache2/conf.d":
@@ -104,14 +103,15 @@ class apache::base {
 	package { "libwww-perl": ensure => installed }
 	apache::module { info: ensure => present }
 	apache::site { munin-stats: ensure => present, content => template("apache/munin-stats"), }
-	munin::plugin {
-		[ "apache_accesses", "apache_processes", "apache_volume" ]:
-			ensure => present,
-			config => "env.url http://${hostname}:${real_munin_stats_port}/server-status?auto"
-	}
-	nagios::service { "http_${apache_port_real}":
-		check_command => "http_port!${apache_port_real}"
-	}
+# Requires storeconfigs and we don't want to use that
+#	munin::plugin {
+#		[ "apache_accesses", "apache_processes", "apache_volume" ]:
+#			ensure => present,
+#			config => "env.url http://${hostname}:${real_munin_stats_port}/server-status?auto"
+#	}
+#	nagios::service { "http_${apache_port_real}":
+#		check_command => "http_port!${apache_port_real}"
+#	}
 
 }
 
@@ -146,9 +146,9 @@ define apache::module ( $ensure = 'present', $require_package = 'apache' ) {
 # Use the $name to disambiguate between requests for the same port from
 # different modules
 define apache::port($port) {
-	concat::fragment {
+	file_line{
 		"apache::port::${name}":
-			target => "/etc/apache2/ports.conf",
-			content => "Listen ${port}\n";
+			path => "/etc/apache2/ports.conf",
+			line => "Listen ${port}",
 	}
 }
