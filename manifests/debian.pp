@@ -24,17 +24,21 @@ class apache::debian inherits apache::base {
 
 	# activate inclusion of unified directory structure
 	file_line { 
-		"include_mods":
-			line => "Include /etc/apache2/mods-enabled/",
+		"include_mods_load":
+			line => "Include mods-enabled/*.load",
+			notify => Exec["reload-apache"],
+			ensure => present, path => "/etc/apache2/apache2.conf";
+		"include_mods_conf":
+			line => "Include mods-enabled/*.conf",
 			notify => Exec["reload-apache"],
 			ensure => present, path => "/etc/apache2/apache2.conf";
 		"include_conf":
-			line => "Include /etc/apache2/conf.d/",
+			line => "Include conf.d/",
 			notify => Exec["reload-apache"],
 			require => File_line["include_mods"],
 			ensure => present, path => "/etc/apache2/apache2.conf";
 		"include_sites":
-			line => "Include /etc/apache2/sites-enabled/",
+			line => "Include sites-enabled/",
 			notify => Exec["reload-apache"],
 			require => File_line["include_conf"],
 			ensure => present, path => "/etc/apache2/apache2.conf";
