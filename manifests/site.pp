@@ -16,7 +16,7 @@
 define apache::site ( $ensure = 'present', $require_package = 'apache', $content = undef, $source = undef) {
 	include apache
 
-	$site_file = "${module_dir_path}/apache/sites/${name}"
+	$site_file = "/etc/apache2/apache/sites-available/${name}"
 	file {
 		$site_file:
 			ensure => $ensure,
@@ -24,14 +24,12 @@ define apache::site ( $ensure = 'present', $require_package = 'apache', $content
 			source => $source,
 			notify => Exec["reload-apache"]
 	}
-
-	# remove legacy sites from debian
+	$site_enabled_file = "/etc/apache2/apache/sites-enabled/${name}"
 	file {
-		"/etc/apache2/sites-available/${name}":
-			notify => Exec["reload-apache"],
-			ensure => absent;
-		"/etc/apache2/sites-enabled/${name}":
-			notify => Exec["reload-apache"],
-			ensure => absent;
+		$site_enabled_file:
+			ensure => $ensure,
+			content => $content,
+			source => $source,
+			notify => Exec["reload-apache"]
 	}
 }

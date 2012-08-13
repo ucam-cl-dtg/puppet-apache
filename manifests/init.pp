@@ -22,7 +22,6 @@ class apache {
 }
 
 class apache::base {
-	module_dir { [ "apache", "apache/mods", "apache/conf", "apache/sites" ]: }
 
 	package {
 		"apache":
@@ -39,17 +38,27 @@ class apache::base {
 
 	apache::port { "apache_class": port => $apache_port_real }
 
-	# TODO: This has to be replaced by OS-specific configuration redirection
-	# into $module_dir_path/apache
 	file { "/etc/apache2/ports.conf":
 		ensure => present,
 		mode => 644, owner => root, group => root,
 	}
 	file {
+		"/etc/apache2/mods-enabled":
+			ensure => directory,
+			mode   => 644,
+			owner  => root, group => root,
+			require => Package['apache'],
+			notify => Exec['reload-apache'];
+		"/etc/apache2/sites-enabled":
+			ensure => directory,
+                        mode   => 644,
+                        owner  => root, group => root,
+                        require => Package['apache'],
+                        notify => Exec['reload-apache'];
 		"/etc/apache2/conf.d":
 			ensure => directory, checksum => mtime,
 			mode => 644, owner => root, group => root,
-			require => Package[apache],
+			require => Package['apache'],
 			notify => Exec["reload-apache"];
 		"/etc/apache2/conf.d/charset":
 			content => "# This really breaks many apps and pages otherwise\n# Disabled: AddDefaultCharset UTF-8\n",
@@ -86,9 +95,9 @@ class apache::base {
 	exec { "reload-apache":
 		refreshonly => true,
 		before => [ Service["apache"], Exec["force-reload-apache"] ],
-		subscribe => [ File["${module_dir_path}/apache/mods"],
-			File["${module_dir_path}/apache/conf"],
-			File["${module_dir_path}/apache/sites"],
+		subscribe => [ File["/etc/apache2/mods-enabled"],
+			File["/etc/apache2/conf.d"],
+			File["/etc/apache2/sites-enabled"],
 			File["/etc/apache2/ports.conf"] ]
 	}
 
