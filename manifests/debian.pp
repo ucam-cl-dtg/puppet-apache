@@ -31,11 +31,12 @@ class apache::debian inherits apache::base {
 		"include_mods_conf":
 			line => "Include mods-enabled/*.conf",
 			notify => Exec["reload-apache"],
+			require => File_line["include_mods_load"],
 			ensure => present, path => "/etc/apache2/apache2.conf";
 		"include_conf":
 			line => "Include conf.d/",
 			notify => Exec["reload-apache"],
-			require => File_line["include_mods"],
+			require => File_line["include_mods_conf"],
 			ensure => present, path => "/etc/apache2/apache2.conf";
 		"include_sites":
 			line => "Include sites-enabled/",
