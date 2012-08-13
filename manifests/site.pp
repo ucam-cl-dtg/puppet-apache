@@ -16,7 +16,7 @@
 define apache::site ( $ensure = 'present', $require_package = 'apache', $content = undef, $source = undef) {
 	include apache
 
-	$site_file = "/etc/apache2/apache/sites-available/${name}"
+	$site_file = "/etc/apache2/sites-available/${name}"
 	file {
 		$site_file:
 			ensure => $ensure,
@@ -24,7 +24,7 @@ define apache::site ( $ensure = 'present', $require_package = 'apache', $content
 			source => $source,
 			notify => Exec["reload-apache"]
 	}
-	$site_enabled_file = "/etc/apache2/apache/sites-enabled/${name}"
+	$site_enabled_file = "/etc/apache2/sites-enabled/${name}"
 	file {
 		$site_enabled_file:
 			ensure => $ensure,
