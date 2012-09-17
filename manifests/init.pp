@@ -9,8 +9,10 @@
 import "awstats.pp"
 import "site.pp"
 
-$sites = "/etc/apache2/sites"
-$mods = "/etc/apache2/mods"
+class apache::params {
+  $sites = "/etc/apache2/sites"
+  $mods = "/etc/apache2/mods"
+}
 
 class apache2 {
 	err ("deprecated class usage, include 'apache' instead")
@@ -21,7 +23,7 @@ class apache {
 	include "apache::${operatingsystem}"
 }
 
-class apache::base {
+class apache::base inherits apache::params {
 
 	package {
 		"apache":
@@ -29,7 +31,7 @@ class apache::base {
 			before => File["/etc/apache2/ports.conf"];
 	}
 
-	service { apache:
+	service { 'apache':
 		ensure => running,
 		require => Package["apache"]
 	}
@@ -43,13 +45,13 @@ class apache::base {
 		mode => 644, owner => root, group => root,
 	}
 	file {
-		"/etc/apache2/mods-enabled":
+		"${mods}-enabled":
 			ensure => directory,
 			mode   => 644,
 			owner  => root, group => root,
 			require => Package['apache'],
 			notify => Exec['reload-apache'];
-		"/etc/apache2/sites-enabled":
+		"${sites}-enabled":
 			ensure => directory,
                         mode   => 644,
                         owner  => root, group => root,
@@ -95,9 +97,9 @@ class apache::base {
 	exec { "reload-apache":
 		refreshonly => true,
 		before => [ Service["apache"], Exec["force-reload-apache"] ],
-		subscribe => [ File["/etc/apache2/mods-enabled"],
+		subscribe => [ File["${mods}-enabled"],
 			File["/etc/apache2/conf.d"],
-			File["/etc/apache2/sites-enabled"],
+			File["${sites}-enabled"],
 			File["/etc/apache2/ports.conf"] ]
 	}
 
@@ -131,6 +133,7 @@ class apache::base {
 # packages that aren't part of the default apache package. Because of 
 # the package dependencies, apache will automagically be included.
 define apache::module ( $ensure = 'present', $require_package = 'apache' ) {
+	$mods = $apache::params::mods
 	case $ensure {
 		'present' : {
 			exec { "/usr/sbin/a2enmod $name":
