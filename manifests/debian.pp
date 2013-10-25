@@ -20,7 +20,8 @@ class apache::debian inherits apache::base {
 	Exec["force-reload-apache"] { command => "/etc/init.d/apache2 force-reload", }
 
 	# remove the default site in debian
-	file { "/etc/apache2/sites-enabled/000-default": ensure => absent }
+	file { ["/etc/apache2/sites-enabled/000-default",
+                "/etc/apache2/sites-enabled/000-default.conf"]: ensure => absent }
 
 	# activate inclusion of unified directory structure
 	file_line { 
