@@ -112,8 +112,8 @@ class apache::base inherits apache::params {
 	$real_munin_stats_port = $munin_stats_port ? { '' => 8666, default => $munin_stats_port }
 	apache::port { "apache::munin": port => $real_munin_stats_port }
 	package { "libwww-perl": ensure => installed }
-	apache::module { info: ensure => present }
-	apache::site { munin-stats: ensure => present, content => template("apache/munin-stats"), }
+	apache::module { 'info': ensure => present }
+	apache::site { 'munin-stats': ensure => present, content => template("apache/munin-stats"), }
 # Requires storeconfigs and we don't want to use that
 #	munin::plugin {
 #		[ "apache_accesses", "apache_processes", "apache_volume" ]:
