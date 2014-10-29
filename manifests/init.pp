@@ -30,6 +30,11 @@ class apache::base inherits apache::params {
 			ensure => installed,
 			before => File["/etc/apache2/ports.conf"];
 	}
+	package {
+		"apache2ctl":
+			ensure => installed,
+	}
+
 
 	service { 'apache':
 		ensure => running,
