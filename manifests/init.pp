@@ -6,8 +6,6 @@
 # where Tim Stoop <tim.stoop@gmail.com> graciously posted this recipe
 # modifications for multiple distros with support from <admin@immerda.ch>
 
-import "awstats.pp"
-import "site.pp"
 
 class apache::params {
   $sites = "/etc/apache2/sites"
