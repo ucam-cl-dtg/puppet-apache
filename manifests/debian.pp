@@ -16,8 +16,8 @@ class apache::debian inherits apache::base {
 		hasrestart => true,
 	}
 
-	Exec["reload-apache"] { command => "/etc/init.d/apache2 reload", }
-	Exec["force-reload-apache"] { command => "/etc/init.d/apache2 force-reload", }
+	Exec["reload-apache"] { command => "/bin/systemctl reload apache2", }
+	Exec["force-reload-apache"] { command => "/bin/systemctl force-reload apache2", }
 
 	# remove the default site in debian
 	file { ["/etc/apache2/sites-enabled/000-default",
